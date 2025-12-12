@@ -9,7 +9,7 @@
 <body>
   <header class="top">
     <h1>음악 취향 기반 커피 추천</h1>
-    <p>5문항으로 오늘의 커피를 추천해줘요 ☕</p>
+    <p>5문항으로 오늘의 커피를 추천해줄게! ☕</p>
   </header>
 
   <main class="wrap">
@@ -19,7 +19,7 @@
       <form id="musicForm">
         <!-- Q1 -->
         <fieldset>
-          <legend>Q1. 선호 장르</legend>
+          <legend>Q1. 선호하는 음악 장르가 뭐야?🎧 </legend>
           <label><input type="radio" name="genre" value="jazz" required> Jazz/Classic</label>
           <label><input type="radio" name="genre" value="lofi"> Lo-fi/Indie</label>
           <label><input type="radio" name="genre" value="hiphop"> Hip-hop/Rock</label>
@@ -28,16 +28,16 @@
 
         <!-- Q2 -->
         <fieldset>
-          <legend>Q2. 주로 듣는 상황</legend>
-          <label><input type="radio" name="mood" value="study" required> 공부/과제</label>
-          <label><input type="radio" name="mood" value="exercise"> 운동</label>
-          <label><input type="radio" name="mood" value="night"> 밤에 혼자</label>
-          <label><input type="radio" name="mood" value="talk"> 카페에서 수다</label>
+          <legend>Q2. 어떨 때 주로 들어?☕</legend>
+          <label><input type="radio" name="mood" value="study" required> 집중모드 (과제/공부)</label>
+          <label><input type="radio" name="mood" value="exercise"> 몸을 풀고 싶다! (산책/운동)</label>
+          <label><input type="radio" name="mood" value="night"> 새벽 감성 타임..</label>
+          <label><input type="radio" name="mood" value="talk"> 카페에서 토크토크</label>
         </fieldset>
 
         <!-- Q3 -->
         <fieldset>
-          <legend>Q3. 깔끔(0) ↔ 진득(100)</legend>
+          <legend>Q3. 선호하는 음료 바디감을 슬라이드바 가벼움(0) ~ 꾸덕함 (100) 으로 표현해줘!🧋 </legend>
           <div class="rangeRow">
             <input type="range" id="heavy" name="heavy" min="0" max="100" value="50">
             <span id="heavyVal">50</span>
@@ -46,15 +46,15 @@
 
         <!-- Q4 -->
         <fieldset>
-          <legend>Q4. 산미(상큼함) 호불호</legend>
+          <legend>Q4. 산미(상큼함) 좋아해?🍊</legend>
           <label><input type="radio" name="acid" value="like" required> 좋아!</label>
-          <label><input type="radio" name="acid" value="ok"> 보통</label>
-          <label><input type="radio" name="acid" value="hate"> 싫어…</label>
+          <label><input type="radio" name="acid" value="ok"> 낫뱃</label>
+          <label><input type="radio" name="acid" value="hate"> 싫어! </label>
         </fieldset>
 
         <!-- Q5 -->
         <fieldset>
-          <legend>Q5. 우유 들어간 커피(라떼류) 호불호</legend>
+          <legend>Q5. 우유 들어간 커피(라떼류)🥛 어때? </legend>
           <label><input type="radio" name="milk" value="like" required> 좋아</label>
           <label><input type="radio" name="milk" value="ok"> 상관없음</label>
           <label><input type="radio" name="milk" value="hate"> 싫어</label>
@@ -65,22 +65,22 @@
     </section>
 
     <section class="card" id="result" style="display:none">
-      <h2 id="coffeeName">오늘의 추천:</h2>
-      <p id="reason"></p>
+      <h2 id="coffeeName">☕ 오늘의 추천:</h2>
+      <div id="reason"></div>
 
       <div class="grid">
         <div>
-          <h3>내 프로파일</h3>
+          <h3>내 커피 취향 프로필</h3>
           <div class="small" id="profileText"></div>
         </div>
         <div>
-          <h3>그래프</h3>
+          <h3>취향 한눈에 보기 📊</h3>
           <canvas id="chart" width="320" height="220"></canvas>
         </div>
       </div>
 
       <div class="row">
-        <button class="btn ghost" id="retry" type="button">다시하기</button>
+        <button class="btn ghost" id="retry" type="button">🔄 다시 해볼래?</button>
       </div>
     </section>
   </main>
@@ -91,11 +91,11 @@
 
 <script>
 const coffees = [
-  { name:"핸드드립", acidity:5, body:2, sweet:2, caffeine:2 },
-  { name:"아이스 아메리카노", acidity:3, body:2, sweet:1, caffeine:3 },
-  { name:"콜드브루", acidity:2, body:4, sweet:2, caffeine:4 },
-  { name:"플랫화이트", acidity:1, body:3, sweet:3, caffeine:2 },
-  { name:"모카", acidity:1, body:4, sweet:5, caffeine:3 }
+  { name:"핸드드립🌿☕", acidity:5, body:2, sweet:2, caffeine:2 },
+  { name:"아이스 아메리카노🧊☕", acidity:3, body:2, sweet:1, caffeine:3 },
+  { name:"콜드브루🧊⚡", acidity:2, body:4, sweet:2, caffeine:4 },
+  { name:"플랫화이트🥛☕", acidity:1, body:3, sweet:3, caffeine:2 },
+  { name:"모카🍫☕", acidity:1, body:4, sweet:5, caffeine:3 }
 ];
 
 const form = document.getElementById("musicForm");
@@ -125,28 +125,35 @@ form.addEventListener("submit", function(e){
   let reasons = [];
 
   // Q1
-  if(genre==="jazz"){ user.acidity+=2; user.body+=1; reasons.push("복잡한 사운드 취향이라 향/산미가 있는 쪽이 잘 맞아."); }
-  if(genre==="lofi"){ user.sweet+=1; user.body+=1; reasons.push("부드러운 무드라 우유/단맛 밸런스가 좋아."); }
-  if(genre==="hiphop"){ user.body+=2; user.caffeine+=1; reasons.push("타격감 있는 취향이라 바디감 있는 쪽이 어울려."); }
-  if(genre==="edm"){ user.caffeine+=2; user.acidity+=1; reasons.push("에너지 높은 취향이라 각성감 있는 선택이 좋아."); }
+  if(genre==="jazz"){ user.acidity+=2; user.body+=1; reasons.push("섬세하고 깊은 음악을 좋아하는 것 같아서, 원두에서도 향과 산미를 음미해 볼 수 있는 커피를 골라봤어!"); }
+  if(genre==="lofi"){ user.sweet+=1; user.body+=1; reasons.push("부드럽게 흐르는 음악을 좋아한다면, 커피도 부드러운 우유 베이스의 달콤한 맛이 입에 편안하게 잘 맞을거야!."); }
+  if(genre==="hiphop"){ user.body+=2; user.caffeine+=1; reasons.push("센 비트의 음악을 좋아한다면 커피도 묵직하게 바디감 있는 커피를 마셔보자ㅎㅎ"); }
+  if(genre==="edm"){ user.caffeine+=2; user.acidity+=1; reasons.push("신나는 음악 취향엔 커피도 카페인으로 도파민 채워보자!"); }
 
   // Q2
-  if(mood==="study"){ user.caffeine+=2; reasons.push("공부/집중 상황이라 카페인 점수를 높게 반영했어."); }
-  if(mood==="exercise"){ user.caffeine+=2; user.body+=1; }
-  if(mood==="night"){ user.body+=2; }
-  if(mood==="talk"){ user.sweet+=2; }
+  if(mood==="study"){ user.caffeine+=2; reasons.push("📚집중이 필요한 상황이라 카페인 쪽에 더 중점을 둬봤어!"); }
+  if(mood==="exercise"){ user.caffeine+=2; user.body+=1; reasons.push("🏃‍♀️몸을 움직일 땐 각성감이 살아있는 커피가 좋지")}
+  if(mood==="night"){ user.body+=2; reasons.push("🌙 혼자 잔잔히 듣는 시간대엔 묵직한 여운이 좋아")}
+  if(mood==="talk"){ user.sweet+=2; reasons.push("🗣️가볍게 즐기는 자리엔 부드럽고 달콤한 쪽이 딱 맞아")}
 
   // Q3 (0~100 -> body 0~3)
   user.body += Math.floor(hv/34);
+  if (hv >= 67) {
+  reasons.push("🧋 꾸덕꾸덕 진한 느낌을 좋아해서, 바디감 있는 쪽으로 기울였어!");
+} else if (hv <= 33) {
+  reasons.push("💧가볍게 마시는 스타일이라, 깔끔한 쪽을 중심으로 봤어!");
+} else {
+  reasons.push("☕ 너무 가볍지도 진하지도 않게 무난한 정도로 골라봤어!");
+}
 
   // Q4
   if(acid==="like"){ user.acidity+=2; }
   if(acid==="ok"){ user.acidity+=1; }
-  if(acid==="hate"){ user.acidity-=1; user.sweet+=1; reasons.push("산미를 싫어해서 단맛 쪽으로 밸런스를 맞췄어."); }
+  if(acid==="hate"){ user.acidity-=1; user.sweet+=1; reasons.push("산미를 싫어해하길래 단맛 쪽으로 밸런스를 맞췄어!"); }
 
   // Q5
   if(milk==="like"){ user.sweet+=1; user.body+=1; }
-  if(milk==="hate"){ user.sweet-=1; user.acidity+=1; reasons.push("우유 베이스를 싫어해서 더 깔끔한 쪽으로 보정했어."); }
+  if(milk==="hate"){ user.sweet-=1; user.acidity+=1; reasons.push("우유 베이스를 싫어해서 더 깔끔한 쪽으로 보정했어!"); }
 
   // clamp
   user.acidity = clamp(user.acidity);
@@ -163,9 +170,10 @@ form.addEventListener("submit", function(e){
 
   // DOM output
   document.getElementById("coffeeName").innerText = `오늘의 추천: ${best.name}`;
-  document.getElementById("reason").innerText = reasons.slice(0,3).join(" ");
+  document.getElementById("reason").innerHTML =
+  reasons.slice(0,3).map(s => `• ${s}`).join("<br>");
   document.getElementById("profileText").innerText =
-    `산미 ${user.acidity}/5 · 바디 ${user.body}/5 · 단맛 ${user.sweet}/5 · 카페인 ${user.caffeine}/5`;
+    `산미🍊${user.acidity}/5 · 바디🧋 ${user.body}/5 · 단맛🍯 ${user.sweet}/5 · 카페인⚡ ${user.caffeine}/5`;
 
   document.getElementById("result").style.display = "block";
 
@@ -180,9 +188,12 @@ form.addEventListener("submit", function(e){
   for(let i=0;i<4;i++){
     const x = 40 + i*70;
     const h = vals[i]*30;
-    ctx.fillRect(x, 180-h, 30, h);
-    ctx.fillText(labels[i], x-5, 205);
-  }
+    ctx.fillStyle = "#7b4b2a"; 
+  ctx.fillRect(x, 180-h, 30, h);
+
+  ctx.fillStyle = "#2f1d12";  
+  ctx.fillText(labels[i], x-5, 205);
+}
 });
 
 document.getElementById("retry").addEventListener("click", ()=>{
