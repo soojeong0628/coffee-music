@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>음악 취향 기반 커피 추천</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="top">
+    <h1>음악 취향 기반 커피 추천</h1>
+    <p>5문항으로 오늘의 커피를 추천해줘요 ☕</p>
+  </header>
+
+  <main class="wrap">
+    <section class="card" id="quiz">
+      <h2>취향 입력</h2>
+
+      <form id="musicForm">
+        <!-- Q1 -->
+        <fieldset>
+          <legend>Q1. 선호 장르</legend>
+          <label><input type="radio" name="genre" value="jazz" required> Jazz/Classic</label>
+          <label><input type="radio" name="genre" value="lofi"> Lo-fi/Indie</label>
+          <label><input type="radio" name="genre" value="hiphop"> Hip-hop/Rock</label>
+          <label><input type="radio" name="genre" value="edm"> EDM/Pop</label>
+        </fieldset>
+
+        <!-- Q2 -->
+        <fieldset>
+          <legend>Q2. 주로 듣는 상황</legend>
+          <label><input type="radio" name="mood" value="study" required> 공부/과제</label>
+          <label><input type="radio" name="mood" value="exercise"> 운동</label>
+          <label><input type="radio" name="mood" value="night"> 밤에 혼자</label>
+          <label><input type="radio" name="mood" value="talk"> 카페에서 수다</label>
+        </fieldset>
+
+        <!-- Q3 -->
+        <fieldset>
+          <legend>Q3. 깔끔(0) ↔ 진득(100)</legend>
+          <div class="rangeRow">
+            <input type="range" id="heavy" name="heavy" min="0" max="100" value="50">
+            <span id="heavyVal">50</span>
+          </div>
+        </fieldset>
+
+        <!-- Q4 -->
+        <fieldset>
+          <legend>Q4. 산미(상큼함) 호불호</legend>
+          <label><input type="radio" name="acid" value="like" required> 좋아!</label>
+          <label><input type="radio" name="acid" value="ok"> 보통</label>
+          <label><input type="radio" name="acid" value="hate"> 싫어…</label>
+        </fieldset>
+
+        <!-- Q5 -->
+        <fieldset>
+          <legend>Q5. 우유 들어간 커피(라떼류) 호불호</legend>
+          <label><input type="radio" name="milk" value="like" required> 좋아</label>
+          <label><input type="radio" name="milk" value="ok"> 상관없음</label>
+          <label><input type="radio" name="milk" value="hate"> 싫어</label>
+        </fieldset>
+
+        <button class="btn" type="submit">추천 받기</button>
+      </form>
+    </section>
+
+    <section class="card" id="result" style="display:none">
+      <h2 id="coffeeName">오늘의 추천:</h2>
+      <p id="reason"></p>
+
+      <div class="grid">
+        <div>
+          <h3>내 프로파일</h3>
+          <div class="small" id="profileText"></div>
+        </div>
+        <div>
+          <h3>그래프</h3>
+          <canvas id="chart" width="320" height="220"></canvas>
+        </div>
+      </div>
+
+      <div class="row">
+        <button class="btn ghost" id="retry" type="button">다시하기</button>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <small>Rule-based MVP · DOM/Event/Canvas 사용</small>
+  </footer>
+
+<script>
+const coffees = [
+  { name:"핸드드립", acidity:5, body:2, sweet:2, caffeine:2 },
+  { name:"아이스 아메리카노", acidity:3, body:2, sweet:1, caffeine:3 },
+  { name:"콜드브루", acidity:2, body:4, sweet:2, caffeine:4 },
+  { name:"플랫화이트", acidity:1, body:3, sweet:3, caffeine:2 },
+  { name:"모카", acidity:1, body:4, sweet:5, caffeine:3 }
+];
+
+const form = document.getElementById("musicForm");
+const heavy = document.getElementById("heavy");
+const heavyVal = document.getElementById("heavyVal");
+
+heavy.addEventListener("input", e => heavyVal.innerText = e.target.value);
+
+function clamp(v){ return Math.max(0, Math.min(5, v)); }
+function dist(u,c){
+  return Math.abs(u.acidity-c.acidity)
+       + Math.abs(u.body-c.body)
+       + Math.abs(u.sweet-c.sweet)
+       + Math.abs(u.caffeine-c.caffeine);
+}
+
+form.addEventListener("submit", function(e){
+  e.preventDefault();
+
+  const genre = form.genre.value;
+  const mood  = form.mood.value;
+  const hv    = parseInt(form.heavy.value, 10);
+  const acid  = form.acid.value;
+  const milk  = form.milk.value;
+
+  let user = { acidity:0, body:0, sweet:0, caffeine:0 };
+  let reasons = [];
+
+  // Q1
+  if(genre==="jazz"){ user.acidity+=2; user.body+=1; reasons.push("복잡한 사운드 취향이라 향/산미가 있는 쪽이 잘 맞아."); }
+  if(genre==="lofi"){ user.sweet+=1; user.body+=1; reasons.push("부드러운 무드라 우유/단맛 밸런스가 좋아."); }
+  if(genre==="hiphop"){ user.body+=2; user.caffeine+=1; reasons.push("타격감 있는 취향이라 바디감 있는 쪽이 어울려."); }
+  if(genre==="edm"){ user.caffeine+=2; user.acidity+=1; reasons.push("에너지 높은 취향이라 각성감 있는 선택이 좋아."); }
+
+  // Q2
+  if(mood==="study"){ user.caffeine+=2; reasons.push("공부/집중 상황이라 카페인 점수를 높게 반영했어."); }
+  if(mood==="exercise"){ user.caffeine+=2; user.body+=1; }
+  if(mood==="night"){ user.body+=2; }
+  if(mood==="talk"){ user.sweet+=2; }
+
+  // Q3 (0~100 -> body 0~3)
+  user.body += Math.floor(hv/34);
+
+  // Q4
+  if(acid==="like"){ user.acidity+=2; }
+  if(acid==="ok"){ user.acidity+=1; }
+  if(acid==="hate"){ user.acidity-=1; user.sweet+=1; reasons.push("산미를 싫어해서 단맛 쪽으로 밸런스를 맞췄어."); }
+
+  // Q5
+  if(milk==="like"){ user.sweet+=1; user.body+=1; }
+  if(milk==="hate"){ user.sweet-=1; user.acidity+=1; reasons.push("우유 베이스를 싫어해서 더 깔끔한 쪽으로 보정했어."); }
+
+  // clamp
+  user.acidity = clamp(user.acidity);
+  user.body    = clamp(user.body);
+  user.sweet   = clamp(user.sweet);
+  user.caffeine= clamp(user.caffeine);
+
+  // pick best
+  let best = coffees[0], bestD = dist(user, best);
+  for(let i=1;i<coffees.length;i++){
+    const d = dist(user, coffees[i]);
+    if(d<bestD){ bestD=d; best=coffees[i]; }
+  }
+
+  // DOM output
+  document.getElementById("coffeeName").innerText = `오늘의 추천: ${best.name}`;
+  document.getElementById("reason").innerText = reasons.slice(0,3).join(" ");
+  document.getElementById("profileText").innerText =
+    `산미 ${user.acidity}/5 · 바디 ${user.body}/5 · 단맛 ${user.sweet}/5 · 카페인 ${user.caffeine}/5`;
+
+  document.getElementById("result").style.display = "block";
+
+  // canvas chart
+  const canvas = document.getElementById("chart");
+  const ctx = canvas.getContext("2d");
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  const labels = ["산미","바디","단맛","카페인"];
+  const vals = [user.acidity,user.body,user.sweet,user.caffeine];
+
+  for(let i=0;i<4;i++){
+    const x = 40 + i*70;
+    const h = vals[i]*30;
+    ctx.fillRect(x, 180-h, 30, h);
+    ctx.fillText(labels[i], x-5, 205);
+  }
+});
+
+document.getElementById("retry").addEventListener("click", ()=>{
+  document.getElementById("result").style.display="none";
+  form.reset();
+  heavyVal.innerText = "50";
+});
+</script>
+</body>
+</html>
