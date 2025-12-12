@@ -1,12 +1,40 @@
-body { font-family: system-ui, sans-serif; margin: 0; background: #f6f6f6; }
+body {
+  font-family: system-ui, sans-serif;
+  margin: 0;
+  background: #f3ede5; 
+  color: #2f1d12;
+}
 .top { padding: 24px 16px; text-align: center; }
 .wrap { max-width: 900px; margin: 0 auto; padding: 0 16px 40px; }
-.card { background: white; padding: 18px; border-radius: 12px; box-shadow: 0 6px 18px rgba(0,0,0,.06); margin-top: 16px; }
+.card {
+  background: #fffaf3;      
+  padding: 18px;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,.06);
+  margin-top: 16px;
+  border: 1px solid #e7d7c3; 
+}
 fieldset { border: 1px solid #ddd; border-radius: 10px; padding: 12px; margin: 12px 0; }
 legend { padding: 0 8px; }
 label { display: inline-block; margin: 6px 10px 6px 0; }
-.btn { padding: 10px 14px; border: 0; border-radius: 10px; cursor: pointer; }
-.btn.ghost { background: transparent; border: 1px solid #ccc; }
+.btn{
+  padding: 10px 14px;
+  border: 0;
+  border-radius: 10px;
+  cursor: pointer;
+  background: #7b4b2a;   /* 커피 브라운 */
+  color: #fff;
+}
+
+.btn:hover{
+  filter: brightness(0.95);
+}
+
+.btn.ghost{
+  background: transparent;
+  border: 1px solid #bfa386; /* 연한 커피 테두리 */
+  color: #5a3a24;
+}
 .rangeRow { display: flex; gap: 10px; align-items: center; }
 .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .row { margin-top: 12px; display: flex; gap: 10px; }
